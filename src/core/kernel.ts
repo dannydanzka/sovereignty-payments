@@ -43,8 +43,16 @@ export interface WebhookResult {
 }
 
 export interface ConfirmResult {
+  readonly amountTotalMinor: number | null;
+  /**
+   * The session's metadata, returned verbatim. The kernel already fetched the session to decide
+   * whether it was paid, so handing back what it read costs nothing and saves the consumer a
+   * second round trip to the provider just to recover its own identifiers.
+   */
+  readonly metadata: Readonly<Record<string, string>>;
   readonly outcome: FulfillmentOutcome | 'unpaid';
   readonly paid: boolean;
+  readonly payerEmail: string | null;
   readonly reference: string | null;
 }
 
@@ -199,7 +207,14 @@ export const createPaymentsKernel = (config: PaymentsKernelConfig): PaymentsKern
       const session = await config.provider.retrieveCheckoutSession(sessionId);
 
       if (!session.paid || !session.paymentRef) {
-        return { outcome: 'unpaid', paid: false, reference: null };
+        return {
+          amountTotalMinor: session.amountTotalMinor,
+          metadata: session.metadata,
+          outcome: 'unpaid',
+          paid: false,
+          payerEmail: session.payerEmail,
+          reference: null,
+        };
       }
 
       const fulfilled = await fulfillPayment({
@@ -218,7 +233,14 @@ export const createPaymentsKernel = (config: PaymentsKernelConfig): PaymentsKern
         );
       }
 
-      return { outcome: fulfilled.outcome, paid: true, reference: session.paymentRef };
+      return {
+        amountTotalMinor: session.amountTotalMinor,
+        metadata: session.metadata,
+        outcome: fulfilled.outcome,
+        paid: true,
+        payerEmail: session.payerEmail,
+        reference: session.paymentRef,
+      };
     },
 
     /**

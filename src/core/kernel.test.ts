@@ -256,7 +256,7 @@ describe('kernel — reconciliation', () => {
   it('reports an unpaid session without fulfilling', async () => {
     const { kernel } = buildKernel({}, createFakeProvider({ session: { paid: false } }));
 
-    expect(await kernel.confirm('sess_1')).toEqual({ outcome: 'unpaid', paid: false, reference: null });
+    expect(await kernel.confirm('sess_1')).toMatchObject({ outcome: 'unpaid', paid: false, reference: null });
     expect(fulfilled).toHaveLength(0);
   });
 
@@ -269,7 +269,9 @@ describe('kernel — reconciliation', () => {
 
     const result = await kernel.confirm('sess_2');
 
-    expect(result).toEqual({ outcome: 'fulfilled', paid: true, reference: 'pi_2' });
+    expect(result).toMatchObject({ outcome: 'fulfilled', paid: true, reference: 'pi_2' });
+    // The kernel hands back what it already read, so the consumer needs no second round trip.
+    expect(result.metadata).toEqual(VALID_METADATA);
     expect(fulfilled).toHaveLength(1);
   });
 

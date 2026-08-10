@@ -33,6 +33,16 @@
       "require": "./dist/testing/index.cjs"
     }
   },
+  "typesVersions": {
+    "*": {
+      "stripe": [
+        "./dist/adapters/stripe/index.d.ts"
+      ],
+      "testing": [
+        "./dist/testing/index.d.ts"
+      ]
+    }
+  },
   "files": [
     "dist"
   ],
