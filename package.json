@@ -1,0 +1,81 @@
+{
+  "name": "@dannydanzka/sovereignty-payments",
+  "version": "0.1.0",
+  "description": "Provider-agnostic payments kernel — checkout, webhook verification, idempotent fulfillment and reconciliation, with swappable provider adapters",
+  "type": "module",
+  "license": "UNLICENSED",
+  "private": false,
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/dannydanzka/sovereignty-payments.git"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./stripe": {
+      "types": "./dist/adapters/stripe/index.d.ts",
+      "import": "./dist/adapters/stripe/index.js",
+      "require": "./dist/adapters/stripe/index.cjs"
+    },
+    "./testing": {
+      "types": "./dist/testing/index.d.ts",
+      "import": "./dist/testing/index.js",
+      "require": "./dist/testing/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsup",
+    "build:watch": "tsup --watch",
+    "prepare": "npm run build",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src --max-warnings=0",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "verify": "npm run type-check && npm run lint && npm run test && npm run build"
+  },
+  "peerDependencies": {
+    "stripe": ">=20"
+  },
+  "peerDependenciesMeta": {
+    "stripe": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.18.0",
+    "@types/node": "^26.2.0",
+    "@vitest/coverage-v8": "^3.0.5",
+    "eslint": "^9.18.0",
+    "stripe": "^20.1.2",
+    "tsup": "^8.3.5",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.21.0",
+    "vitest": "^3.0.5"
+  },
+  "keywords": [
+    "payments",
+    "checkout",
+    "webhook",
+    "idempotency",
+    "stripe",
+    "agnostic",
+    "code-sovereignty"
+  ]
+}
