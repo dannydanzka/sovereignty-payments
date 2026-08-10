@@ -29,6 +29,42 @@ export {
   type PaymentsLogger,
 } from './core/ports';
 
+export {
+  createPaymentsKernel,
+  type CheckoutResult,
+  type ConfirmResult,
+  type PaymentsKernel,
+  type PaymentsKernelConfig,
+  type WebhookResult,
+} from './core/kernel';
+
+export {
+  createPurchaseRegistry,
+  definePurchase,
+  type FulfillContext,
+  type PreparedPurchase,
+  type PrepareContext,
+  type PurchaseDefinition,
+  type PurchaseRegistry,
+  type RegisteredPurchase,
+  type RegistryOptions,
+} from './core/registry';
+
+export {
+  decodeJsonField,
+  encodeMetadata,
+  KIND_KEY,
+  requireField,
+  type MetadataValue,
+} from './core/metadata';
+
+export { createEffectRunner } from './core/effects';
+
+export {
+  fulfillmentKey,
+  type FulfillmentOutcome,
+} from './core/idempotency';
+
 export type {
   LineItem,
   PaymentProvider,

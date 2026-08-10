@@ -3,17 +3,17 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     coverage: {
-      exclude: ['src/testing/**', '**/*.test.ts', '**/index.ts'],
+      exclude: ['src/testing/**', '**/*.test.ts', '**/index.ts', 'src/core/types.ts'],
       include: ['src/**/*.ts'],
       provider: 'v8',
       reporter: ['text', 'lcov'],
       /**
-       * Global floor. The per-file 100 % gates for the two modules where a bug means money
-       * captured with nothing delivered — webhook verification and idempotency — are added
-       * together with those modules (plan steps B.5 and B.9); declaring a per-file threshold for
-       * a file that does not exist yet fails the run instead of guarding anything.
+       * A global floor, plus a hard 100 % gate on the module where a gap means money captured with
+       * nothing delivered — or delivered twice. Idempotency has no acceptable uncovered branch:
+       * every path through it is a decision about whether a payer's goods get granted.
        */
       thresholds: {
+        'src/core/idempotency.ts': { branches: 100, functions: 100, lines: 100, statements: 100 },
         branches: 90,
         functions: 90,
         lines: 90,

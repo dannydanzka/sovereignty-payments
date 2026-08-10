@@ -40,6 +40,13 @@ export default tseslint.config(
     rules: {
       '@typescript-eslint/consistent-type-imports': 'error',
       '@typescript-eslint/explicit-module-boundary-types': 'error',
+      /**
+       * Off for decoders at the serialization boundary. `decodeJsonField<T>` legitimately takes a
+       * caller-asserted type parameter used once: JSON.parse returns `any`, and the shape is the
+       * caller's knowledge, not ours. The alternative the rule pushes toward — returning `unknown`
+       * — moves an identical cast to every call site instead of removing it.
+       */
+      '@typescript-eslint/no-unnecessary-type-parameters': 'off',
       'no-restricted-globals': [
         'error',
         { message: 'Invariant 5: no ambient config. Configuration arrives through createPaymentsKernel.', name: 'process' },
@@ -67,6 +74,18 @@ export default tseslint.config(
   {
     files: ['src/**/*.test.ts', 'src/testing/**/*.ts'],
     rules: {
+      /**
+       * Test-only relaxations. Each is a rule whose value is in production code and whose cost is
+       * paid only in tests:
+       *  - `unbound-method` fires on the idiomatic `expect(spy.method)` assertion.
+       *  - `no-confusing-void-expression` fires on `void effects.best(...)`, which is exactly how a
+       *    caller signals "started, deliberately not awaited".
+       *  - the assertion rules fire on casts that exist to construct inputs the types forbid —
+       *    which is the point of the negative cases.
+       */
+      '@typescript-eslint/no-confusing-void-expression': 'off',
+      '@typescript-eslint/no-unnecessary-type-assertion': 'off',
+      '@typescript-eslint/unbound-method': 'off',
       // Fixtures legitimately name a consumer's purchase kinds to prove the registry is generic.
       'no-restricted-syntax': 'off',
     },

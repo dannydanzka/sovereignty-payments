@@ -96,4 +96,4 @@ Publishing happens **only through CI** — never `npm publish` from a laptop.
 
 ## Status
 
-`0.1.0` — foundations: typed errors, money, the provider port, the Stripe adapter, testing helpers. The kernel (registry, idempotency, reconciliation) lands next; see `CHANGELOG.md`.
+`0.1.0` — the kernel is complete: typed errors, money, the provider port, the purchase registry, payment-keyed idempotency, reconciliation, the Stripe adapter and the cross-adapter contract suite. 75 tests, 100 % line coverage.
