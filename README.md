@@ -92,7 +92,8 @@ Two rules the port encodes and an adapter must honor:
 yarn verify     # type-check + lint + test + build
 ```
 
-Publishing happens **only through CI** — never `npm publish` from a laptop.
+Publishing happens **only through CI**, with Changesets — never `npm publish` from a laptop: `yarn changeset`, merge to
+`main`, merge the version PR it opens.
 
 ## Status
 
