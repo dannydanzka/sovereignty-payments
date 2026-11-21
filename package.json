@@ -1,7 +1,7 @@
 {
   "name": "@dannydanzka/sovereignty-payments",
-  "version": "0.1.0",
-  "description": "Provider-agnostic payments kernel \u2014 checkout, webhook verification, idempotent fulfillment and reconciliation, with swappable provider adapters",
+  "version": "0.2.0",
+  "description": "Provider-agnostic payments kernel — checkout, webhook verification, idempotent fulfillment and reconciliation, with swappable provider adapters",
   "type": "module",
   "license": "UNLICENSED",
   "private": false,
