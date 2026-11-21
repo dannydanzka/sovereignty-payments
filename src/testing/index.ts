@@ -23,7 +23,9 @@ export const signWebhookPayload = (payload: string, secret: string, timestamp: n
 };
 
 /** In-memory {@link PaymentEventStore}. Atomic by virtue of the single-threaded event loop. */
-export const createInMemoryEventStore = (): PaymentEventStore & { readonly seen: Map<string, EventClaim> } => {
+export const createInMemoryEventStore = (): PaymentEventStore & {
+  readonly seen: Map<string, EventClaim>;
+} => {
   const seen = new Map<string, EventClaim>();
 
   return {
@@ -67,8 +69,10 @@ export const createFakeProvider = (
 
   const buildSession = (input?: ProviderCheckoutInput): ProviderSession => ({
     amountTotalMinor:
-      input?.lineItems.reduce((sum, item) => sum + item.unitAmountMinor * (item.quantity ?? 1), 0) ??
-      null,
+      input?.lineItems.reduce(
+        (sum, item) => sum + item.unitAmountMinor * (item.quantity ?? 1),
+        0
+      ) ?? null,
     id: 'sess_fake',
     metadata: input?.metadata ?? {},
     paid: false,

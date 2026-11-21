@@ -58,7 +58,10 @@ export const runOnce = async (params: {
 
     return { outcome: 'fulfilled', result };
   } catch (error) {
-    await params.eventStore.fail(params.key, error instanceof Error ? error.message : String(error));
+    await params.eventStore.fail(
+      params.key,
+      error instanceof Error ? error.message : String(error)
+    );
     throw error;
   }
 };

@@ -49,11 +49,19 @@ export default tseslint.config(
       '@typescript-eslint/no-unnecessary-type-parameters': 'off',
       'no-restricted-globals': [
         'error',
-        { message: 'Invariant 5: no ambient config. Configuration arrives through createPaymentsKernel.', name: 'process' },
+        {
+          message:
+            'Invariant 5: no ambient config. Configuration arrives through createPaymentsKernel.',
+          name: 'process',
+        },
       ],
       'no-restricted-properties': [
         'error',
-        { message: 'Invariant 5: no ambient config. Pass values in explicitly.', object: 'process', property: 'env' },
+        {
+          message: 'Invariant 5: no ambient config. Pass values in explicitly.',
+          object: 'process',
+          property: 'env',
+        },
       ],
       'no-restricted-syntax': [
         'error',

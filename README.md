@@ -28,11 +28,12 @@ Requires a `.npmrc` pointing the `@dannydanzka` scope at GitHub Packages.
 
 ## Entry points
 
-| Import | Contains | Pulls in a provider SDK? |
-|---|---|---|
-| `@dannydanzka/sovereignty-payments` | kernel, ports, types, errors, money helpers | no — pure TypeScript |
-| `@dannydanzka/sovereignty-payments/stripe` | the Stripe adapter | yes (`stripe`, an optional peer) |
-| `@dannydanzka/sovereignty-payments/testing` | webhook signer, fake provider, in-memory event store | no |
+| Import                                      | Contains                                             | Pulls in a provider SDK?         |
+| ------------------------------------------- | ---------------------------------------------------- | -------------------------------- |
+| `@dannydanzka/sovereignty-payments`         | kernel, ports, types, errors, money helpers          | no — pure TypeScript             |
+| `@dannydanzka/sovereignty-payments/stripe`  | the Stripe adapter                                   | yes (`stripe`, an optional peer) |
+| `@dannydanzka/sovereignty-payments/prisma`  | the idempotency store over a Prisma delegate         | no — typed structurally          |
+| `@dannydanzka/sovereignty-payments/testing` | webhook signer, fake provider, in-memory event store | no                               |
 
 ## Usage
 
@@ -41,7 +42,7 @@ import { createStripeProvider } from '@dannydanzka/sovereignty-payments/stripe';
 import { toMinorUnits } from '@dannydanzka/sovereignty-payments';
 
 const provider = createStripeProvider({
-  secretKey: config.secretKey,        // injected — this library never reads process.env
+  secretKey: config.secretKey, // injected — this library never reads process.env
   webhookSecret: config.webhookSecret,
 });
 
@@ -54,10 +55,39 @@ const session = await provider.createCheckoutSession({
 });
 
 // Later, in your webhook endpoint — the raw body, untransformed:
-const event = provider.verifyWebhook(rawBody, signature);   // throws PaymentError('signature_invalid')
+const event = provider.verifyWebhook(rawBody, signature); // throws PaymentError('signature_invalid')
 ```
 
 `metadata` set at checkout is mirrored onto the payment intent automatically, because `payment_intent.*` webhooks carry the intent's metadata and not the session's — a detail that silently produces empty metadata in fulfillment if you miss it.
+
+## The Prisma event store
+
+Every product that takes payments needs the same idempotency table; it lives here once.
+
+```prisma
+model ProcessedPaymentEvent {
+  eventId     String    @id @db.VarChar(255)
+  claimedAt   DateTime  @default(now())
+  completedAt DateTime?
+  error       String?   @db.VarChar(1000)
+  result      Json?
+
+  @@index([completedAt])
+  @@map("processed_payment_events")
+}
+```
+
+```ts
+import { createPrismaPaymentEventStore } from '@dannydanzka/sovereignty-payments/prisma';
+
+const eventStore = createPrismaPaymentEventStore(prisma.processedPaymentEvent, logger);
+```
+
+## Into a product's errors
+
+`toAppErrorOptions(error, details?)` returns `{ code, statusCode, details, cause }` for the platform's
+`createAppError(message, options)`: a configuration fault answers 500, a provider outage 503, a missing session 502, a
+bad signature 400, bad metadata or an unknown purchase kind 422. The message stays the product's.
 
 ## Money
 
@@ -67,15 +97,15 @@ Amounts cross the port in **minor units**, and the exponent is not universally 2
 
 This library is consumed by several unrelated products. Anything product-shaped that reaches it becomes dead weight — or wrong defaults — for the next consumer.
 
-| # | Invariant | Enforced by |
-|---|---|---|
-| 1 | No domain vocabulary. The library never knows what is being sold. | ESLint banned-identifier rule |
-| 2 | No user-facing text. Failures are typed codes; the consumer localizes. | ESLint; `PaymentError` carries a code, not a sentence |
-| 3 | No persistence. State arrives only through `PaymentEventStore`. | no ORM/DB dependency permitted |
-| 4 | No framework. No React, Next, Redux, styled-components. | dependency list |
-| 5 | No ambient config. Zero `process.env`, zero file reads. | ESLint |
-| 6 | No policy defaults. Absent configuration is an error, never a guess. | unit tests assert the throw |
-| 7 | No opinion about what was bought. `metadata` is the consumer's generic. | type signatures + contract suite |
+| #   | Invariant                                                               | Enforced by                                           |
+| --- | ----------------------------------------------------------------------- | ----------------------------------------------------- |
+| 1   | No domain vocabulary. The library never knows what is being sold.       | ESLint banned-identifier rule                         |
+| 2   | No user-facing text. Failures are typed codes; the consumer localizes.  | ESLint; `PaymentError` carries a code, not a sentence |
+| 3   | No persistence. State arrives only through `PaymentEventStore`.         | no ORM/DB dependency permitted                        |
+| 4   | No framework. No React, Next, Redux, styled-components.                 | dependency list                                       |
+| 5   | No ambient config. Zero `process.env`, zero file reads.                 | ESLint                                                |
+| 6   | No policy defaults. Absent configuration is an error, never a guess.    | unit tests assert the throw                           |
+| 7   | No opinion about what was bought. `metadata` is the consumer's generic. | type signatures + contract suite                      |
 
 ## Adding a provider
 

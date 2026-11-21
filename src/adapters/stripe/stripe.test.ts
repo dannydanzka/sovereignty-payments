@@ -119,7 +119,10 @@ describe('stripe adapter — event normalization', () => {
       type: 'payment_intent.succeeded',
     });
 
-    expect(event).toMatchObject({ kind: 'payment.succeeded', receiptUrl: 'https://receipt.test/1' });
+    expect(event).toMatchObject({
+      kind: 'payment.succeeded',
+      receiptUrl: 'https://receipt.test/1',
+    });
   });
 
   it('normalizes a refund', () => {
@@ -135,7 +138,9 @@ describe('stripe adapter — event normalization', () => {
   it('normalizes a late receipt', () => {
     expect(
       deliver({
-        data: { object: { id: 'ch_3', payment_intent: 'pi_abc', receipt_url: 'https://receipt.test/2' } },
+        data: {
+          object: { id: 'ch_3', payment_intent: 'pi_abc', receipt_url: 'https://receipt.test/2' },
+        },
         id: 'evt_charge_updated',
         type: 'charge.updated',
       })

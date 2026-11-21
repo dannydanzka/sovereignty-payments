@@ -13,12 +13,9 @@ export {
   type PaymentErrorContext,
 } from './core/errors';
 
-export {
-  currencyExponent,
-  fromMinorUnits,
-  isSupportedCurrency,
-  toMinorUnits,
-} from './core/money';
+export { toAppErrorOptions, type PaymentAppErrorOptions } from './core/app-error';
+
+export { currencyExponent, fromMinorUnits, isSupportedCurrency, toMinorUnits } from './core/money';
 
 export {
   systemClock,
@@ -60,10 +57,7 @@ export {
 
 export { createEffectRunner } from './core/effects';
 
-export {
-  fulfillmentKey,
-  type FulfillmentOutcome,
-} from './core/idempotency';
+export { fulfillmentKey, type FulfillmentOutcome } from './core/idempotency';
 
 export type {
   LineItem,
