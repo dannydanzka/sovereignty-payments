@@ -41,7 +41,10 @@ const demoPurchase = definePurchase<{ price: number; reference: string }, DemoMe
 const buildKernel = (
   overrides: Partial<Parameters<typeof createPaymentsKernel>[0]> = {},
   provider = createFakeProvider()
-): { eventStore: ReturnType<typeof createInMemoryEventStore>; kernel: ReturnType<typeof createPaymentsKernel> } => {
+): {
+  eventStore: ReturnType<typeof createInMemoryEventStore>;
+  kernel: ReturnType<typeof createPaymentsKernel>;
+} => {
   const eventStore = createInMemoryEventStore();
 
   const kernel = createPaymentsKernel({
@@ -57,16 +60,15 @@ const buildKernel = (
   return { eventStore, kernel };
 };
 
-const succeededEvent = (metadata: Record<string, string>, id = 'evt_1', paymentRef = 'pi_1') =>
-  ({
-    amountMinor: 49950,
-    currency: 'mxn',
-    id,
-    kind: 'payment.succeeded' as const,
-    metadata,
-    payerEmail: 'payer@test.com',
-    paymentRef,
-  });
+const succeededEvent = (metadata: Record<string, string>, id = 'evt_1', paymentRef = 'pi_1') => ({
+  amountMinor: 49950,
+  currency: 'mxn',
+  id,
+  kind: 'payment.succeeded' as const,
+  metadata,
+  payerEmail: 'payer@test.com',
+  paymentRef,
+});
 
 const VALID_METADATA = { extras: '["a","b"]', kind: 'demo_purchase', reference: 'ord_1' };
 
@@ -104,14 +106,20 @@ describe('kernel — checkout', () => {
     expect(call?.successUrl).toBe('https://app.test/done');
     expect(call?.lineItems[0]?.unitAmountMinor).toBe(49950);
     // Nested values are JSON-encoded on the way out so the decoder can be strict on the way back.
-    expect(call?.metadata).toEqual({ extras: '["a","b"]', kind: 'demo_purchase', reference: 'ord_1' });
+    expect(call?.metadata).toEqual({
+      extras: '["a","b"]',
+      kind: 'demo_purchase',
+      reference: 'ord_1',
+    });
   });
 
   it('fails loudly when the provider returns no redirect URL', async () => {
     const provider = createFakeProvider({ session: { url: null } });
     const { kernel } = buildKernel({}, provider);
 
-    await expect(kernel.checkout(demoPurchase, { price: 10, reference: 'x' })).rejects.toMatchObject({
+    await expect(
+      kernel.checkout(demoPurchase, { price: 10, reference: 'x' })
+    ).rejects.toMatchObject({
       code: PAYMENT_ERROR_CODES.SESSION_NOT_CREATED,
     });
   });
@@ -244,7 +252,12 @@ describe('kernel — webhook fulfillment', () => {
     const receiptKernel = buildKernel(
       { onReceipt, onRefund },
       createFakeProvider({
-        event: { id: 'evt_c', kind: 'receipt.updated', paymentRef: 'pi_9', receiptUrl: 'https://r.test' },
+        event: {
+          id: 'evt_c',
+          kind: 'receipt.updated',
+          paymentRef: 'pi_9',
+          receiptUrl: 'https://r.test',
+        },
       })
     ).kernel;
     expect((await receiptKernel.handleWebhook('{}', 'sig')).outcome).toBe('receipt');
@@ -256,7 +269,11 @@ describe('kernel — reconciliation', () => {
   it('reports an unpaid session without fulfilling', async () => {
     const { kernel } = buildKernel({}, createFakeProvider({ session: { paid: false } }));
 
-    expect(await kernel.confirm('sess_1')).toMatchObject({ outcome: 'unpaid', paid: false, reference: null });
+    expect(await kernel.confirm('sess_1')).toMatchObject({
+      outcome: 'unpaid',
+      paid: false,
+      reference: null,
+    });
     expect(fulfilled).toHaveLength(0);
   });
 
@@ -279,7 +296,9 @@ describe('kernel — reconciliation', () => {
     // The webhook and the return path share one idempotency key: whichever arrives first wins.
     const eventStore = createInMemoryEventStore();
 
-    const webhookProvider = createFakeProvider({ event: succeededEvent(VALID_METADATA, 'evt_x', 'pi_3') });
+    const webhookProvider = createFakeProvider({
+      event: succeededEvent(VALID_METADATA, 'evt_x', 'pi_3'),
+    });
     const { kernel: viaWebhook } = buildKernel({ eventStore }, webhookProvider);
     await viaWebhook.handleWebhook('{}', 'sig');
 

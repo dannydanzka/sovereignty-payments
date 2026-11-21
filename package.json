@@ -1,7 +1,7 @@
 {
   "name": "@dannydanzka/sovereignty-payments",
   "version": "0.1.0",
-  "description": "Provider-agnostic payments kernel — checkout, webhook verification, idempotent fulfillment and reconciliation, with swappable provider adapters",
+  "description": "Provider-agnostic payments kernel \u2014 checkout, webhook verification, idempotent fulfillment and reconciliation, with swappable provider adapters",
   "type": "module",
   "license": "UNLICENSED",
   "private": false,
@@ -31,10 +31,18 @@
       "types": "./dist/testing/index.d.ts",
       "import": "./dist/testing/index.js",
       "require": "./dist/testing/index.cjs"
+    },
+    "./prisma": {
+      "types": "./dist/adapters/prisma/index.d.ts",
+      "import": "./dist/adapters/prisma/index.js",
+      "require": "./dist/adapters/prisma/index.cjs"
     }
   },
   "typesVersions": {
     "*": {
+      "prisma": [
+        "./dist/adapters/prisma/index.d.ts"
+      ],
       "stripe": [
         "./dist/adapters/stripe/index.d.ts"
       ],
@@ -57,8 +65,10 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "verify": "yarn type-check && yarn lint && yarn test && yarn build",
-    "release": "changeset publish"
+    "verify": "yarn type-check && yarn lint && yarn format:check && yarn test && yarn build",
+    "release": "changeset publish",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "peerDependencies": {
     "stripe": ">=20"
@@ -74,6 +84,7 @@
     "@types/node": "^24",
     "@vitest/coverage-v8": "^3.0.5",
     "eslint": "^9.18.0",
+    "prettier": "^3.4.2",
     "stripe": "^20.1.2",
     "tsup": "^8.3.5",
     "typescript": "^5.9.3",

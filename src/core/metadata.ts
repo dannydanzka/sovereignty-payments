@@ -9,7 +9,8 @@ import { PAYMENT_ERROR_CODES, PaymentError } from './errors';
  */
 export const KIND_KEY = 'kind';
 
-export type MetadataValue = boolean | number | string | readonly unknown[] | Record<string, unknown>;
+export type MetadataValue =
+  boolean | number | string | readonly unknown[] | Record<string, unknown>;
 
 /**
  * Flatten a consumer's metadata into the string map every provider accepts.
@@ -37,8 +38,7 @@ export const encodeMetadata = (
   for (const [key, value] of Object.entries(metadata)) {
     if (value === undefined) continue;
 
-    encoded[key] =
-      typeof value === 'object' ? JSON.stringify(value) : String(value);
+    encoded[key] = typeof value === 'object' ? JSON.stringify(value) : String(value);
   }
 
   return encoded;

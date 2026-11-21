@@ -45,7 +45,9 @@ const toSession = (session: Stripe.Checkout.Session): ProviderSession => ({
 
 const receiptUrlOf = (intent: Stripe.PaymentIntent): string | undefined => {
   const charge = intent.latest_charge;
-  return typeof charge === 'object' && charge !== null ? (charge.receipt_url ?? undefined) : undefined;
+  return typeof charge === 'object' && charge !== null
+    ? (charge.receipt_url ?? undefined)
+    : undefined;
 };
 
 const toEvent = (event: Stripe.Event): ProviderEvent => {

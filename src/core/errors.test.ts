@@ -24,9 +24,9 @@ describe('PaymentError', () => {
   });
 
   it('lets the caller override retryability when it knows better', () => {
-    expect(new PaymentError(PAYMENT_ERROR_CODES.METADATA_INVALID, { retryable: true }).retryable).toBe(
-      true
-    );
+    expect(
+      new PaymentError(PAYMENT_ERROR_CODES.METADATA_INVALID, { retryable: true }).retryable
+    ).toBe(true);
   });
 
   it('preserves cause and context for diagnosis', () => {
